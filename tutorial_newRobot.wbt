@@ -1,0 +1,336 @@
+#VRML_SIM R2021a utf8
+WorldInfo {
+  basicTimeStep 16
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation -0.8243078435122807 0.5397717649819606 0.17077183858116712 0.6954421150272775
+  position 0.343414969335557 0.5744927522127401 0.8429757935942632
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Floor {
+  size 1 1
+}
+WoodenBox {
+  translation 0.39 0.01 0
+  name "wooden box(1)"
+  size 0.2 0.02 0.8
+}
+WoodenBox {
+  translation -0.29 0.01 0
+  name "wooden box(2)"
+  size 0.4 0.02 0.8
+}
+DEF Wall_1 Solid {
+  translation 0 0.05 0.5
+  children [
+    DEF BOX_WALL Shape {
+      appearance PBRAppearance {
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 1 0.1 0.02
+      }
+    }
+  ]
+  name "solid(1)"
+  boundingObject USE BOX_WALL
+}
+DEF Wall_2 Solid {
+  translation 0 0.05 -0.5
+  children [
+    DEF BOX_WALL Shape {
+      appearance PBRAppearance {
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 1 0.1 0.02
+      }
+    }
+  ]
+  name "solid(2)"
+  boundingObject USE BOX_WALL
+}
+DEF Wall_3 Solid {
+  translation 0.5 0.05 0
+  rotation 0 1 0 -1.5707996938995747
+  children [
+    DEF BOX_WALL Shape {
+      appearance PBRAppearance {
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 1 0.1 0.02
+      }
+    }
+  ]
+  name "solid(3)"
+  boundingObject USE BOX_WALL
+}
+DEF Wall_4 Solid {
+  translation -0.5 0.05 0
+  rotation 0 1 0 -1.5707996938995747
+  children [
+    DEF BOX_WALL Shape {
+      appearance PBRAppearance {
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 1 0.1 0.02
+      }
+    }
+  ]
+  name "solid(4)"
+  boundingObject USE BOX_WALL
+}
+Robot {
+  translation -0.4 0.095 0
+  children [
+    GPS {
+      name "GPS"
+    }
+    InertialUnit {
+      translation 0 0.05 0
+      children [
+        DEF IMU Shape {
+          appearance PBRAppearance {
+            baseColor 1 0.2 0.6
+            roughness 1
+            metalness 0
+          }
+          geometry Sphere {
+            radius 0.01
+            subdivision 2
+          }
+        }
+      ]
+      name "IMU"
+      boundingObject USE IMU
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.04 -0.05 0.06
+      }
+      device [
+        PositionSensor {
+          name "wheel_sensR"
+        }
+        RotationalMotor {
+          name "wheel1"
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.05 0.06
+        rotation 1 0 0 1.5707996938995747
+        children [
+          DEF Wheel Shape {
+            appearance PBRAppearance {
+              baseColor 0.4 0.2 1
+              roughness 1
+              metalness 0
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.02
+            }
+          }
+        ]
+        boundingObject USE Wheel
+        physics DEF Wheel_Physics Physics {
+          density -1
+          mass 1
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor -0.04 -0.05 0.06
+      }
+      device [
+        RotationalMotor {
+          name "wheel2"
+        }
+      ]
+      endPoint Solid {
+        translation -0.04 -0.05 0.06
+        rotation 1 0 0 1.5707996938995747
+        children [
+          DEF Wheel Shape {
+            appearance PBRAppearance {
+              baseColor 0.4 0.2 1
+              roughness 1
+              metalness 0
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.02
+            }
+          }
+        ]
+        name "solid(1)"
+        boundingObject USE Wheel
+        physics DEF Wheel_Physics Physics {
+          density -1
+          mass 1
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor 0.04 -0.05 -0.06
+      }
+      device [
+        PositionSensor {
+          name "wheel_sensL"
+        }
+        RotationalMotor {
+          name "wheel3"
+        }
+      ]
+      endPoint Solid {
+        translation 0.04 -0.05 -0.06
+        rotation 1 0 0 1.5707996938995747
+        children [
+          DEF Wheel Shape {
+            appearance PBRAppearance {
+              baseColor 0.4 0.2 1
+              roughness 1
+              metalness 0
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.02
+            }
+          }
+        ]
+        name "solid(2)"
+        boundingObject USE Wheel
+        physics DEF Wheel_Physics Physics {
+          density -1
+          mass 1
+        }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        axis 0 0 1
+        anchor -0.04 -0.05 -0.06
+      }
+      device [
+        RotationalMotor {
+          name "wheel4"
+        }
+      ]
+      endPoint Solid {
+        translation -0.04 -0.05 -0.06
+        rotation 1 0 0 1.5707996938995747
+        children [
+          DEF Wheel Shape {
+            appearance PBRAppearance {
+              baseColor 0.4 0.2 1
+              roughness 1
+              metalness 0
+            }
+            geometry Cylinder {
+              height 0.02
+              radius 0.02
+            }
+          }
+        ]
+        name "solid(3)"
+        boundingObject USE Wheel
+        physics DEF Wheel_Physics Physics {
+          density -1
+          mass 1
+        }
+      }
+    }
+    Lidar {
+      translation 0.051 0 0.05
+      rotation 0 1 0 -1.5707996938995747
+      children [
+        DEF lidar_shape Shape {
+          appearance PBRAppearance {
+            baseColor 0.4 1 0.4
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.02 0.02 0.01
+          }
+        }
+      ]
+      name "lidar_sensR"
+      boundingObject USE lidar_shape
+      tiltAngle -0.5
+      horizontalResolution 11
+      fieldOfView 0.5
+      verticalFieldOfView 0.25
+    }
+    Lidar {
+      translation 0.051 0 -0.05
+      rotation 0 1 0 -1.5707996938995747
+      children [
+        DEF lidar_shape Shape {
+          appearance PBRAppearance {
+            baseColor 0.4 1 0.4
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.02 0.02 0.01
+          }
+        }
+      ]
+      name "lidar_sensL"
+      boundingObject USE lidar_shape
+      tiltAngle -0.5
+      horizontalResolution 11
+      fieldOfView 0.5
+      verticalFieldOfView 0.25
+    }
+    DistanceSensor {
+      translation 0.051 0 0
+      children [
+        DEF SensorShape Shape {
+          appearance PBRAppearance {
+            baseColor 1 0.5 0
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.01 0.01 0.01
+          }
+        }
+      ]
+      name "dist_sens"
+      boundingObject USE SensorShape
+    }
+    DEF RobotBody Shape {
+      appearance PBRAppearance {
+        baseColor 0.6 0.7 1
+        roughness 1
+        metalness 0
+      }
+      geometry Box {
+        size 0.1 0.1 0.1
+      }
+    }
+  ]
+  boundingObject USE RobotBody
+  physics Physics {
+    density -1
+    mass 5
+  }
+  controller "sensor_test"
+}

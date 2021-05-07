@@ -1,0 +1,34 @@
+robot size: 0.1 0.1 0.1
+
+GPS location in robot: 0 0 0
+IMU location in robot: 0 0.05 0 (shouldn't matter)
+
+Right lidar 	location: 0.051 0 0.05
+				fov: 0.5
+				horiz resolution: 11
+				vertical fov: 0.25
+				num layers: 4
+				tilt angle: 0.5
+				
+Left lidar 		location: 0.051 0 -0.05
+				fov: 0.5
+				horiz resolution: 11
+				vertical fov: 0.25
+				num layers: 4
+				tilt angle: 0.5
+
+Wheel locations:
+front left:		0.04 -0.05 0.06
+back left:		-0.04 -0.05 0.06
+front right:	0.04 -0.05 -0.06
+back right:		-0.04 -0.05 -0.06
+radius:			0.02
+
+Data formats:
+lidar: 	[lidarL.x lidarL.y lidarL.z lidarR.x lidarR.y lidarR.z t]
+imu:	[roll pitch yaw t]
+gps:	[x y z t]
+wheel:	[posL posR t]
+
+
+all numbers are in meters or radians
