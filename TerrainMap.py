@@ -30,7 +30,7 @@ def OrganizeTimestamp(lidar, gps, imu):
         data.append(curr_data)
     return data
 
-def ConvertLidarToTerrain(data):
+def ConvertLidarToTerrain(data, points):
     # takes in list of data at a single timestamp
     gps = data[0]
     imu = data[1]
@@ -43,24 +43,22 @@ def ConvertLidarToTerrain(data):
     rot_y = imu[1]
     rot_z = imu[2]
 
-    points = []
-
     for i in range(2, len(data)):
         lidar = data[i]
         lidar_x1 = lidar[0]
         lidar_y1 = lidar[1]
-        lidar_z1 = -1 * lidar[2]
+        lidar_z1 = lidar[2]
 
         lidar_x2 = lidar[3]
         lidar_y2 = lidar[4]
-        lidar_z2 = -1 * lidar[5]
+        lidar_z2 = lidar[5]
 
         P1 = [lidar_x1*sin(rot_y) - lidar_z1*cos(rot_y) + pos_x + 0.051, lidar_y1 + pos_y, lidar_x1*cos(rot_y) + lidar_z1*sin(rot_y) + pos_z + 0.05]
         P2 = [lidar_x2*sin(rot_y) - lidar_z2*cos(rot_y) + pos_x + 0.051, lidar_y2 + pos_y, lidar_x2*cos(rot_y) + lidar_z2*sin(rot_y) + pos_z - 0.05]
         points.append(P1)
         points.append(P2)
 
-    return points
+    return
 
 
 def PlotPoints(points):
@@ -88,8 +86,10 @@ def main():
     imu = read_file('imu_data.txt')
 
     data = OrganizeTimestamp(lidar, gps, imu)
-    print(gps)
-    points = ConvertLidarToTerrain(data[0])
+    points = []
+    ConvertLidarToTerrain(data[0], points)
+    ConvertLidarToTerrain(data[2], points)
+    #print(data[0])
     PlotPoints(points)
 
 if __name__ == "__main__":
