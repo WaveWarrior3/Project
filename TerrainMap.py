@@ -77,18 +77,19 @@ def PlotPoints(points):
     ax.set_xlabel("x")
     ax.set_ylabel("z")
     ax.set_zlabel("y")
+    #plt.zlim([0, 1])
     plt.show()
 
 
 def main():
-    lidar = read_file('lidar_data.txt')
-    gps = read_file('gps_data.txt')
-    imu = read_file('imu_data.txt')
+    lidar = read_file('Good Data/lidar_data.txt')
+    gps = read_file('Good Data/gps_data.txt')
+    imu = read_file('Good Data/imu_data.txt')
 
     data = OrganizeTimestamp(lidar, gps, imu)
     points = []
-    ConvertLidarToTerrain(data[0], points)
-    ConvertLidarToTerrain(data[2], points)
+    for i in range(100):
+        ConvertLidarToTerrain(data[i], points)
     #print(data[0])
     PlotPoints(points)
 
