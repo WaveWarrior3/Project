@@ -1,5 +1,5 @@
 import numpy as np
-from math import sin, cos
+from math import sin, cos, sqrt
 import matplotlib.pyplot as plt
 
 
@@ -43,18 +43,21 @@ def ConvertLidarToTerrain(data, points):
     rot_y = imu[1]
     rot_z = imu[2]
 
+    if abs(rot_y) > 0.01:
+        return
+
     for i in range(2, len(data)):
         lidar = data[i]
         lidar_x1 = lidar[0]
-        lidar_y1 = lidar[1]
-        lidar_z1 = lidar[2]
+        lidar_y1 = lidar[2] / sqrt(2)
+        lidar_z1 = lidar[2] / sqrt(2)
 
         lidar_x2 = lidar[3]
-        lidar_y2 = lidar[4]
-        lidar_z2 = lidar[5]
+        lidar_y2 = lidar[5] / sqrt(2)
+        lidar_z2 = lidar[5] / sqrt(2)
 
-        P1 = [lidar_x1*sin(rot_y) - lidar_z1*cos(rot_y) + pos_x + 0.051, lidar_y1 + pos_y, lidar_x1*cos(rot_y) + lidar_z1*sin(rot_y) + pos_z + 0.05]
-        P2 = [lidar_x2*sin(rot_y) - lidar_z2*cos(rot_y) + pos_x + 0.051, lidar_y2 + pos_y, lidar_x2*cos(rot_y) + lidar_z2*sin(rot_y) + pos_z - 0.05]
+        P1 = [lidar_x1*sin(rot_x) - lidar_z1*cos(rot_x) + pos_x + 0.051, lidar_y1 + pos_y, lidar_x1*cos(rot_x) + lidar_z1*sin(rot_x) + pos_z + 0.05]
+        P2 = [lidar_x2*sin(rot_x) - lidar_z2*cos(rot_x) + pos_x + 0.051, lidar_y2 + pos_y, lidar_x2*cos(rot_x) + lidar_z2*sin(rot_x) + pos_z - 0.05]
         points.append(P1)
         points.append(P2)
 
@@ -77,7 +80,6 @@ def PlotPoints(points):
     ax.set_xlabel("x")
     ax.set_ylabel("z")
     ax.set_zlabel("y")
-    #plt.zlim([0, 1])
     plt.show()
 
 
@@ -88,7 +90,7 @@ def main():
 
     data = OrganizeTimestamp(lidar, gps, imu)
     points = []
-    for i in range(100):
+    for i in range(len(data)):
         ConvertLidarToTerrain(data[i], points)
     #print(data[0])
     PlotPoints(points)
