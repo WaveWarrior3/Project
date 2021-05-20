@@ -1,5 +1,5 @@
 import numpy as np
-from math import sin, cos, sqrt
+from math import sin, cos, sqrt, atan2, acos, asin
 import matplotlib.pyplot as plt
 
 
@@ -30,6 +30,8 @@ def OrganizeTimestamp(lidar, gps, imu):
         data.append(curr_data)
     return data
 
+
+
 def ConvertLidarToTerrain(data, points):
     # takes in list of data at a single timestamp
     gps = data[0]
@@ -43,35 +45,45 @@ def ConvertLidarToTerrain(data, points):
     rot_y = imu[1]
     rot_z = imu[2]
 
-    if abs(rot_y) > 0.01:
-        return
 
     for i in range(2, len(data)):
         # read in x,y,z data
         lidar = data[i]
-        lidar_x1 = lidar[0]
+        lidar_x1 = lidar[0] + 0.05
         lidar_y1 = lidar[2] / sqrt(2)
-        lidar_z1 = lidar[2] / sqrt(2)
+        lidar_z1 = (lidar[2] / sqrt(2)) - 0.051
+        
 
-        lidar_x2 = lidar[3]
+        lidar_x2 = lidar[3] - 0.05
         lidar_y2 = lidar[5] / sqrt(2)
-        lidar_z2 = lidar[5] / sqrt(2)
+        lidar_z2 = (lidar[5] / sqrt(2)) - 0.051
 
-        # convert vertical rotation
-        middle_x1 = lidar_x1
-        middle_y1 = 1*lidar_y1*cos(rot_y) + lidar_z1*sin(rot_y)
-        middle_z1 = 1*lidar_z1*cos(rot_y) - lidar_y1*sin(rot_y)
 
-        middle_x2 = lidar_x2
-        middle_y2 = lidar_y2*cos(rot_y) + lidar_z2*sin(rot_y)
-        middle_z2 = lidar_z2*cos(rot_y) - lidar_y2*sin(rot_y)
+        # convert coordinates
+        P1 = [-1*lidar_z1, -1*lidar_x1, lidar_y1]
+        P2 = [-1*lidar_z2, -1*lidar_x2, lidar_y2]
 
-        # convert horizontal rotation
-        P1 = [middle_x1*sin(rot_z) - middle_z1*cos(rot_z) + pos_x + 0.051, middle_y1 + pos_y, middle_x1*cos(rot_z) + middle_z1*sin(rot_z) + pos_z + 0.05]
-        P2 = [middle_x2*sin(rot_z) - middle_z2*cos(rot_z) + pos_x + 0.051, middle_y2 + pos_y, middle_x2*cos(rot_z) + middle_z2*sin(rot_z) + pos_z - 0.05]
+        # apply pitch
+        pitch1 = [cos(-1*rot_y)*P1[0] + sin(-1*rot_y)*P1[2], P1[1], -1*sin(-1*rot_y)*P1[0] + cos(-1*rot_y)*P1[2]]
+        pitch2 = [cos(-1*rot_y)*P2[0] + sin(-1*rot_y)*P2[2], P2[1], -1*sin(-1*rot_y)*P2[0] + cos(-1*rot_y)*P2[2]]
+        
+        # apply roll
+        roll1 = [cos(rot_x)*pitch1[0] - sin(rot_x)*pitch1[1], sin(rot_x)*pitch1[0] + cos(rot_x)*pitch1[1], pitch1[2]]
+        roll2 = [cos(rot_x)*pitch2[0] - sin(rot_x)*pitch2[1], sin(rot_x)*pitch2[0] + cos(rot_x)*pitch2[1], pitch2[2]]
+
+        # apply yaw
+        yaw1 = [roll1[0], cos(rot_z)*roll1[1] -sin(rot_z)*roll1[2], sin(rot_z)*roll1[1] + cos(rot_z)*roll1[2]]
+        yaw2 = [roll1[0], cos(rot_z)*roll2[1] -sin(rot_z)*roll2[2], sin(rot_z)*roll2[1] + cos(rot_z)*roll2[2]]
+        
+
+        # convert coordinates to global and add offsets
+        # P1 = [pitch1[0] + pos_x, pitch1[2] + pos_y, -1*pitch1[1] + pos_z]
+        # P2 = [pitch2[0] + pos_x, pitch2[2] + pos_y, -1*pitch2[1] + pos_z]
+        P1 = [yaw1[0] + pos_x, yaw1[2] + pos_y, -1*yaw1[1] + pos_z]
+        P2 = [yaw2[0] + pos_x, yaw2[2] + pos_y, -1*yaw2[1] + pos_z]
+        
         points.append(P1)
-        points.append(P2)
-
+        points.append(P2)        
     return
 
 
@@ -80,18 +92,35 @@ def PlotPoints(points):
     y = []
     z = []
 
+    x2 = []
+    y2 = []
+    z2 = []
+
     for i in range(len(points)):
         x.append(points[i][0])
         y.append(points[i][1])
         z.append(points[i][2])
-
+        x2.append(str(points[i][0]) + ", ")
+        y2.append(str(points[i][1]) + ", ")
+        z2.append(str(points[i][2]) + ", ")
+    
     fig = plt.figure(figsize = (10, 7))
     ax = plt.axes(projection = "3d")
-    ax.scatter3D(x, z, y, color = "green") # change order of y and z so the axes match our model
+    ax.scatter3D(x, z, y) # change order of y and z so the axes match our model
     ax.set_xlabel("x")
     ax.set_ylabel("z")
     ax.set_zlabel("y")
     plt.show()
+
+    return x2, y2, z2
+    
+
+
+def write_points(data, name):
+    f = open(name, 'w')
+    f.writelines(data)
+    f.close()
+
 
 
 def main():
@@ -101,10 +130,11 @@ def main():
 
     data = OrganizeTimestamp(lidar, gps, imu)
     points = []
-    for i in range(200):
+    for i in range(len(data)):
         ConvertLidarToTerrain(data[i], points)
     #print(data[0])
-    PlotPoints(points)
+    x, y, z = PlotPoints(points)
+    
 
 if __name__ == "__main__":
     main()
