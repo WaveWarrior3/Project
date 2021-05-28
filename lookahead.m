@@ -4,6 +4,10 @@ function [Lz,Rz,time,Lpos,Rpos] = lookahead(xdat,ydat,zdat,omegaL,omegaR,alphaL,
 %   then uses k-nearest algorithm to estimate the heights the wheels will
 %   encounter over that path.
 
+%xdat is forward
+%ydat is left
+%zdat is gravity axis (up)
+
 %CAR PARAMETERS AND K-NEAREST NUMBER AND NUMBER OF POINTS
 %IF YOU WANNA CHANGE SOMETHING IT'S PROBABLY THIS
 R = 0.34;
@@ -18,7 +22,7 @@ Rpos = zeros(2,pts);
 pos = zeros(2,pts);
 
 %initial values
-theta = pi/2; %forward, as it were
+theta = 0; %forward, as it were
 x = 0;
 y = 0;
 
