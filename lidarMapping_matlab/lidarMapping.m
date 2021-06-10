@@ -1,4 +1,4 @@
-function [T] = lidarMapping(T, lidar_data, imu_data, gps_data, numPts)
+function [T] = lidarMapping(T, lidar_data, imu_data, gps_data, gps_prev, numPts)
     %% Transform 1
     transform_data = lidar_data;
 
@@ -21,9 +21,11 @@ function [T] = lidarMapping(T, lidar_data, imu_data, gps_data, numPts)
     p = rpyt(2);
     y = rpyt(3);
     
-    R = [cos(p)*cos(y), cos(p)*sin(y), -sin(p)
-        sin(r)*sin(p)*cos(y)-cos(r)*sin(y), sin(r)*sin(p)*sin(y)+cos(r)*cos(y), cos(p)*sin(r)
-        cos(r)*sin(p)*cos(y)+sin(r)*sin(y), cos(r)*sin(p)*sin(y)-sin(r)*cos(y), cos(p)*cos(r)];
+    B = [1 0 0; 0 cos(p) sin(p); 0 -sin(p) cos(p)]; % rotation about x = pitch
+    C = [cos(y) 0 -sin(y); 0 1 0; sin(y) 0 cos(y)]; % rotation about y = yaw
+    D = [cos(r) sin(r) 0; -sin(r) cos(r) 0; 0 0 1]; % rotation about z = roll
+    
+    R = B*C*D;
     Rinv = inv(R);
     
     transform_data(:,1:3) = (Rinv*transform_data(:,1:3)')';
@@ -39,14 +41,18 @@ function [T] = lidarMapping(T, lidar_data, imu_data, gps_data, numPts)
         transform_data(jj,4:6) = transform_data(jj,4:6) + xyz;
     end
 
-    z_offset = (2.22-0.76);
-    transform_data(:,3) = transform_data(:,3) + z_offset;
-    transform_data(:,6) = transform_data(:,6) + z_offset;
+    %z_offset = (2.22-0.76);
+    %transform_data(:,3) = transform_data(:,3) + z_offset;
+    %transform_data(:,6) = transform_data(:,6) + z_offset;
     
     %% Update Terrain Map
     T(1:length(T)-numPts,:) = T(numPts+1:length(T),:);
     T(length(T)-numPts+1:length(T),:) = transform_data;
     
+%     for jj=1:length(T)
+%         T(jj,1:3) = T(jj,1:3) - xyz + gps_prev(1:3);
+%         T(jj,4:6) = T(jj,4:6) - xyz + gps_prev(1:3);
+%     end
 end
 
 

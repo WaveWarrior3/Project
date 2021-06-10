@@ -3,7 +3,7 @@ close all
 clc
 
 %% Load Lidar Data
-lidar_data = readmatrix('fullcar_data/lidar_data.txt');
+lidar_data = readmatrix('fullcar_data/lidar_data_truth.txt');
 numPts = 100;
 
 %% Plot Raw Data
@@ -41,16 +41,22 @@ transform_data(:,1) = transform_data(:,1) + 0.9;
 transform_data(:,4) = transform_data(:,4) - 0.9;
 
 %% Transform 3
-rpyt = readmatrix('fullcar_data/imu_data.txt');
+rpyt = readmatrix('fullcar_data/imu_data_truth.txt');
 
 for ii=1:length(rpyt)
     r = rpyt(ii,1);
     p = rpyt(ii,2);
     y = rpyt(ii,3);
     
-    R = [cos(p)*cos(y), cos(p)*sin(y), -sin(p)
-        sin(r)*sin(p)*cos(y)-cos(r)*sin(y), sin(r)*sin(p)*sin(y)+cos(r)*cos(y), cos(p)*sin(r)
-        cos(r)*sin(p)*cos(y)+sin(r)*sin(y), cos(r)*sin(p)*sin(y)-sin(r)*cos(y), cos(p)*cos(r)];
+    B = [1 0 0; 0 cos(p) sin(p); 0 -sin(p) cos(p)]; % rotation about x = pitch
+    C = [cos(y) 0 -sin(y); 0 1 0; sin(y) 0 cos(y)]; % rotation about y = yaw
+    D = [cos(r) sin(r) 0; -sin(r) cos(r) 0; 0 0 1]; % rotation about z = roll
+    
+    R = B*C*D;
+    
+    %R = [cos(p)*cos(y), cos(p)*sin(y), -sin(p)
+    %    sin(r)*sin(p)*cos(y)-cos(r)*sin(y), sin(r)*sin(p)*sin(y)+cos(r)*cos(y), cos(p)*sin(r)
+    %    cos(r)*sin(p)*cos(y)+sin(r)*sin(y), cos(r)*sin(p)*sin(y)-sin(r)*cos(y), cos(p)*cos(r)];
     Rinv = inv(R);
     
     transform_data((ii-1)*numPts+1:ii*numPts,1:3) = (Rinv*transform_data((ii-1)*numPts+1:ii*numPts,1:3)')';
@@ -58,7 +64,7 @@ for ii=1:length(rpyt)
 end
 
 %% Transform 4
-xyzt = readmatrix('fullcar_data/gps_data.txt');
+xyzt = readmatrix('fullcar_data/gps_data_truth.txt');
 
 for ii=1:length(xyzt)
     xyz = xyzt(ii,1:3);
